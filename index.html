@@ -1,0 +1,2081 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DRF + PostgreSQL Academy · API desde cero</title>
+<meta name="description" content="Guía progresiva de Django REST Framework con PostgreSQL y fundamentos de bases de datos.">
+<style>
+:root{--bg:#071017;--panel:#0c1821;--panel2:#10212c;--text:#eaf2f6;--muted:#99acb8;--line:#1d3543;--accent:#7dd3fc;--green:#6ee7b7;--yellow:#fde68a;--red:#fca5a5;--shadow:0 12px 32px rgba(0,0,0,.22)}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:linear-gradient(135deg,#061018,#0a1721 45%,#071119);color:var(--text);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none} button,input{font:inherit}
+.topbar{height:64px;position:fixed;inset:0 0 auto 0;z-index:30;background:rgba(7,16,23,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 22px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;white-space:nowrap} .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,#4fc3f7,#6ee7b7);display:grid;place-items:center;color:#04202a;font-weight:900}
+.search{flex:1;max-width:620px;margin:auto;position:relative} .search input{width:100%;background:#0b1a24;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px 14px 10px 38px;outline:none} .search:before{content:'⌕';position:absolute;left:13px;top:6px;color:var(--muted);font-size:22px}
+.top-actions{display:flex;gap:8px} .iconbtn{background:#0b1a24;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 11px;cursor:pointer}
+.sidebar{position:fixed;top:64px;bottom:0;left:0;width:310px;overflow:auto;padding:18px 14px 80px;border-right:1px solid var(--line);background:#08131b;z-index:20}
+.progress-card{padding:14px;border:1px solid var(--line);background:#0b1a24;border-radius:14px;margin-bottom:16px} .progress-line{height:8px;background:#102936;border-radius:999px;overflow:hidden;margin:8px 0} .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#6ee7b7)} .progress-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.nav-group{margin:14px 0} .nav-group-title{font-size:11px;letter-spacing:.12em;color:#6f8795;font-weight:800;text-transform:uppercase;margin:8px 9px} .nav-link{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:9px;color:#adbec8;font-size:13px;margin:2px 0} .nav-link span{min-width:25px;color:#638095;font-size:11px} .nav-link:hover,.nav-link.active{background:#112532;color:#fff} .nav-link.done{color:#b9f4d8} .nav-link.done:after{content:'✓';margin-left:auto;color:var(--green)}
+.main{margin-left:310px;padding-top:64px} .hero{max-width:1180px;margin:auto;padding:64px 42px 34px} .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--green);font-weight:900} h1{font-size:clamp(38px,5.2vw,72px);line-height:1.02;margin:12px 0 18px;letter-spacing:-.04em} .hero p{color:#b8c7cf;font-size:18px;max-width:830px} .badges{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0} .badge{border:1px solid var(--line);background:#0e202b;border-radius:999px;padding:7px 11px;color:#c8d6dd;font-size:12px}
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px} .road{padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(14,32,43,.72)} .road b{display:block;color:var(--accent);margin-bottom:3px} .road small{color:var(--muted)}
+.reference{margin-top:20px;border-left:3px solid var(--accent);background:#0d202c;padding:14px 16px;border-radius:0 12px 12px 0;color:#bed0da}
+.content{max-width:1180px;margin:auto;padding:0 42px 100px} .lesson{scroll-margin-top:84px;border-top:1px solid var(--line);padding:58px 0 20px} .lesson-kicker{font-size:12px;letter-spacing:.13em;color:var(--green);font-weight:900} h2{font-size:clamp(28px,3.6vw,46px);line-height:1.1;margin:8px 0 6px;letter-spacing:-.025em} .lead{color:#9eb1bc;font-size:18px;margin-top:0} .lesson-actions{display:flex;gap:8px;margin:15px 0 22px} .understand,.bookmark{border:1px solid var(--line);background:#0d1d27;color:#cbd9df;border-radius:9px;padding:8px 12px;cursor:pointer} .understand.on{border-color:#2f8066;background:#0c2a22;color:#a7f3d0} .bookmark.on{border-color:#9a7c2d;color:#fde68a}
+.easy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px} .mini-card{border:1px solid var(--line);background:linear-gradient(160deg,#0c1a24,#0a171f);padding:18px;border-radius:14px} .mini-card b{font-size:12px;letter-spacing:.04em;color:#cce8f4} .mini-card p{color:#aebfc8;margin:8px 0 0}
+.project-box{margin-top:18px;border:1px solid #22506a;background:#0a1a25;border-radius:16px;padding:20px} .box-title{font-size:12px;font-weight:900;letter-spacing:.1em;color:#7dd3fc} .file-row{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0} .file-chip{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;border:1px solid #285168;background:#0c2634;border-radius:8px;padding:6px 8px;color:#bde9fb} .project-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:14px} .subhead{font-size:12px;font-weight:800;color:#c4d4dc;margin:8px 0} .tree{height:100%;min-height:180px}
+pre{margin:0;background:#061117;border:1px solid #173444;border-radius:12px;padding:16px;overflow:auto;color:#d2e7ef;font:13px/1.58 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre} code{font-family:inherit} .steps{list-style:none;padding:0;margin:0} .steps li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)} .steps li:last-child{border-bottom:0} .stepnum{display:grid;place-items:center;min-width:26px;height:26px;border-radius:7px;background:#14384b;color:#9bdfff;font-weight:800;font-size:12px}
+.code-wrap{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden} .code-head{display:flex;justify-content:space-between;align-items:center;background:#0d202b;padding:9px 12px;color:#9fc1d1;font-size:12px;font-weight:700} .copy{border:1px solid #294b5c;background:#0a1720;color:#bad0db;border-radius:7px;padding:5px 9px;cursor:pointer} .code-wrap pre{border:0;border-radius:0;background:#050d12}
+.check{margin-top:14px;padding:16px;border:1px solid #285745;background:#0b211b;border-radius:13px} .check b{color:#9ff2ca;font-size:12px} .check p{margin:6px 0 0;color:#b9d6c8} .activity{margin-top:12px;padding:16px;border:1px solid #755e1c;background:#28200b;border-radius:13px} .activity b{color:var(--yellow);font-size:12px} .activity p{margin:6px 0;color:#e7d9a8} .activity small{color:#a8955d}
+footer{border-top:1px solid var(--line);padding:30px 42px;color:#758c99;max-width:1180px;margin:auto}
+.no-results{display:none;margin:30px 0;padding:20px;border:1px solid var(--line);border-radius:12px;color:var(--muted)}
+@media(max-width:980px){.sidebar{transform:translateX(-100%);transition:.25s} body.menu-open .sidebar{transform:none} .main{margin-left:0} .roadmap{grid-template-columns:1fr 1fr} .easy-grid,.project-grid{grid-template-columns:1fr} .top-actions .label{display:none}}
+@media(max-width:620px){.topbar{padding:0 10px;gap:8px} .brand strong{display:none} .hero,.content{padding-left:18px;padding-right:18px} .hero{padding-top:38px} .roadmap{grid-template-columns:1fr} .search input{font-size:13px} h1{font-size:40px}}
+body.light{--bg:#f4f7f8;--panel:#fff;--panel2:#fff;--text:#14242d;--muted:#60727c;--line:#d8e1e5;--accent:#0369a1;--green:#047857;--yellow:#a16207;--shadow:0 12px 32px rgba(17,24,39,.08);background:#f4f7f8} body.light .topbar,body.light .sidebar{background:rgba(249,251,252,.95)} body.light .sidebar{background:#f8fafb} body.light .progress-card,body.light .nav-link:hover,body.light .nav-link.active,body.light .mini-card,body.light .project-box,body.light .code-head,body.light .search input,body.light .iconbtn{background:#fff} body.light pre,body.light .code-wrap pre{background:#10212a;color:#e7f5fa} body.light .check{background:#edf9f3} body.light .activity{background:#fff9df} body.light .hero p,body.light .lead,body.light .mini-card p{color:#526771}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="iconbtn" id="menuBtn" aria-label="Menú">☰</button>
+  <a class="brand" href="#inicio"><span class="logo">API</span><strong>DRF + PostgreSQL Academy</strong></a>
+  <div class="search"><input id="search" placeholder="Buscar: serializers, JOIN, migraciones..." aria-label="Buscar"></div>
+  <div class="top-actions"><button class="iconbtn" id="themeBtn">◐ <span class="label">Tema</span></button></div>
+</header>
+<aside class="sidebar">
+  <div class="progress-card"><b>Progreso del curso</b><div class="progress-line"><div class="progress-fill" id="progressFill"></div></div><div class="progress-meta"><span id="progressText">0%</span><span id="progressCount">0/41</span></div></div>
+  <nav><div class="nav-group"><div class="nav-group-title">Inicio</div><a class="nav-link" href="#inicio" data-target="inicio"><span>01</span>DRF + PostgreSQL desde cero</a></div><div class="nav-group"><div class="nav-group-title">Fundamentos Web y API</div><a class="nav-link" href="#web-http" data-target="web-http"><span>02</span>Cliente, servidor, HTTP y API</a><a class="nav-link" href="#rest-json" data-target="rest-json"><span>03</span>REST, recursos y JSON</a></div><div class="nav-group"><div class="nav-group-title">Base de datos desde cero</div><a class="nav-link" href="#bd-conceptos" data-target="bd-conceptos"><span>04</span>Base de datos, tabla, fila y columna</a><a class="nav-link" href="#pk-fk" data-target="pk-fk"><span>05</span>Clave primaria y clave foránea</a><a class="nav-link" href="#relaciones" data-target="relaciones"><span>06</span>Relaciones 1:1, 1:N y N:M</a><a class="nav-link" href="#tipos-restricciones" data-target="tipos-restricciones"><span>07</span>Tipos, NULL, UNIQUE, DEFAULT y CHECK</a><a class="nav-link" href="#normalizacion" data-target="normalizacion"><span>08</span>Normalización sin complicarse</a></div><div class="nav-group"><div class="nav-group-title">SQL básico</div><a class="nav-link" href="#sql-basico" data-target="sql-basico"><span>09</span>SQL: CREATE, INSERT y SELECT</a><a class="nav-link" href="#sql-filtros" data-target="sql-filtros"><span>10</span>WHERE, ORDER BY, UPDATE y DELETE</a><a class="nav-link" href="#sql-join" data-target="sql-join"><span>11</span>JOIN y GROUP BY</a></div><div class="nav-group"><div class="nav-group-title">PostgreSQL</div><a class="nav-link" href="#postgres-instalar" data-target="postgres-instalar"><span>12</span>Instalar PostgreSQL y reconocer sus herramientas</a><a class="nav-link" href="#postgres-comandos" data-target="postgres-comandos"><span>13</span>psql: comandos esenciales</a><a class="nav-link" href="#postgres-db-user" data-target="postgres-db-user"><span>14</span>Crear usuario y base del proyecto</a></div><div class="nav-group"><div class="nav-group-title">Django + DRF</div><a class="nav-link" href="#entorno" data-target="entorno"><span>15</span>Python, entorno virtual e instalación</a><a class="nav-link" href="#crear-proyecto" data-target="crear-proyecto"><span>16</span>Crear el proyecto y la app</a><a class="nav-link" href="#settings-postgres" data-target="settings-postgres"><span>17</span>Conectar Django con PostgreSQL</a></div><div class="nav-group"><div class="nav-group-title">Modelos y ORM</div><a class="nav-link" href="#modelo-programa" data-target="modelo-programa"><span>18</span>Primer modelo: Programa</a><a class="nav-link" href="#modelo-estudiante" data-target="modelo-estudiante"><span>19</span>Modelo Estudiante y ForeignKey</a><a class="nav-link" href="#migraciones" data-target="migraciones"><span>20</span>Migraciones: makemigrations y migrate</a><a class="nav-link" href="#orm" data-target="orm"><span>21</span>ORM: crear, consultar, filtrar y actualizar</a><a class="nav-link" href="#select-related" data-target="select-related"><span>22</span>Consultas relacionadas: select_related</a></div><div class="nav-group"><div class="nav-group-title">Django REST Framework</div><a class="nav-link" href="#serializers" data-target="serializers"><span>23</span>Serializer: de modelo a JSON</a><a class="nav-link" href="#api-view" data-target="api-view"><span>24</span>Tu primera vista de API con @api_view</a><a class="nav-link" href="#list-create" data-target="list-create"><span>25</span>Listar y crear estudiantes manualmente</a><a class="nav-link" href="#viewset-router" data-target="viewset-router"><span>26</span>ModelViewSet + Router</a><a class="nav-link" href="#crud-rutas" data-target="crud-rutas"><span>27</span>CRUD completo y rutas exactas</a></div><div class="nav-group"><div class="nav-group-title">API bien diseñada</div><a class="nav-link" href="#status-errors" data-target="status-errors"><span>28</span>Códigos HTTP y errores</a><a class="nav-link" href="#validacion" data-target="validacion"><span>29</span>Validación personalizada</a><a class="nav-link" href="#filtros" data-target="filtros"><span>30</span>Filtros simples por query params</a><a class="nav-link" href="#paginacion" data-target="paginacion"><span>31</span>Paginación</a></div><div class="nav-group"><div class="nav-group-title">Seguridad básica</div><a class="nav-link" href="#auth" data-target="auth"><span>32</span>Autenticación y permisos</a><a class="nav-link" href="#token" data-target="token"><span>33</span>TokenAuthentication de DRF</a><a class="nav-link" href="#proteger-delete" data-target="proteger-delete"><span>34</span>Permisos por acción</a></div><div class="nav-group"><div class="nav-group-title">Pruebas</div><a class="nav-link" href="#pruebas-manuales" data-target="pruebas-manuales"><span>35</span>Probar con Browsable API y curl</a><a class="nav-link" href="#tests" data-target="tests"><span>36</span>Tests automáticos de API</a></div><div class="nav-group"><div class="nav-group-title">Base de datos aplicada</div><a class="nav-link" href="#transacciones" data-target="transacciones"><span>37</span>Transacciones</a><a class="nav-link" href="#indices" data-target="indices"><span>38</span>Índices y rendimiento básico</a></div><div class="nav-group"><div class="nav-group-title">Herramientas Django</div><a class="nav-link" href="#admin" data-target="admin"><span>39</span>Admin para inspeccionar datos</a></div><div class="nav-group"><div class="nav-group-title">Proyecto final</div><a class="nav-link" href="#proyecto-final" data-target="proyecto-final"><span>40</span>Proyecto final: API Academia</a></div><div class="nav-group"><div class="nav-group-title">Cierre</div><a class="nav-link" href="#deploy" data-target="deploy"><span>41</span>Antes de producción</a></div></nav>
+</aside>
+<main class="main">
+  <section class="hero">
+    <div class="eyebrow">DJANGO REST FRAMEWORK · POSTGRESQL · BASES DE DATOS</div>
+    <h1>De cero a una API REST conectada a PostgreSQL</h1>
+    <p>Ruta progresiva para estudiantes: primero entiende HTTP, REST y bases de datos; después instala PostgreSQL, modela relaciones, conecta Django, aprende ORM, serializers, ViewSets, autenticación, pruebas y termina con un CRUD completo.</p>
+    <div class="badges"><span class="badge">Django 6.1</span><span class="badge">DRF 3.18.x</span><span class="badge">Python 3.12+</span><span class="badge">PostgreSQL 15+ · recomendado 18.x</span><span class="badge">Proyecto progresivo: api_academia</span></div>
+    <div class="roadmap">
+      <div class="road"><b>1 · Entiende</b><small>HTTP, REST, JSON y conceptos de BD.</small></div>
+      <div class="road"><b>2 · Modela</b><small>PK, FK, relaciones, SQL y PostgreSQL.</small></div>
+      <div class="road"><b>3 · Construye</b><small>Django, ORM, serializers, ViewSets y Router.</small></div>
+      <div class="road"><b>4 · Comprueba</b><small>CRUD, seguridad, tests y proyecto final.</small></div>
+    </div>
+    <div class="reference"><b>Referencia técnica actualizada a septiembre de 2026.</b> DRF 3.18 añadió soporte para Django 6.1; Django 6.1 soporta PostgreSQL 15+ y recomienda psycopg 3; PostgreSQL 18 es la rama estable actual. El curso evita “magia”: antes de ModelViewSet construye una vista manual para que se entienda el flujo.</div>
+  </section>
+  <div class="content">
+    <div class="no-results" id="noResults">No encontré capítulos con ese texto.</div>
+    <section class="lesson" id="inicio" data-title="drf + postgresql desde cero" data-group="inicio">
+      <div class="lesson-kicker">01 · INICIO</div>
+      <h2>DRF + PostgreSQL desde cero</h2>
+      <p class="lead">Construye una API académica completa sin saltos</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="inicio">○ Pendiente</button><button class="bookmark" data-bookmark="inicio">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>En este curso vas a construir una API. Una API no es una página con botones: es un servicio que recibe peticiones HTTP y responde datos, normalmente JSON.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Piensa en una ventanilla: el cliente entrega una solicitud, la API valida qué se pide, consulta o modifica la base de datos y devuelve una respuesta.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Primero debes conocer el resultado final y entender que todas las lecciones modifican el mismo proyecto.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 api_academia/README.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+└── README.md   ← editas ahora</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea una carpeta llamada api_academia.</div></li><li><span class="stepnum">2</span><div>Dentro crea README.md.</div></li><li><span class="stepnum">3</span><div>Escribe el objetivo: gestionar programas y estudiantes mediante una API REST.</div></li><li><span class="stepnum">4</span><div>No empieces un proyecto nuevo en cada capítulo.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># API Academia
+
+Proyecto progresivo con Django REST Framework + PostgreSQL.
+
+Recursos principales:
+- programas
+- estudiantes
+
+Objetivo: crear, listar, consultar, actualizar y eliminar datos mediante HTTP y JSON.</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Al terminar debes poder explicar qué recursos tendrá la API y que todo crecerá dentro de api_academia/.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Dibuja en una hoja el recorrido: Cliente → API → PostgreSQL → API → JSON.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="web-http" data-title="cliente, servidor, http y api" data-group="fundamentos web y api">
+      <div class="lesson-kicker">02 · FUNDAMENTOS WEB Y API</div>
+      <h2>Cliente, servidor, HTTP y API</h2>
+      <p class="lead">Antes de DRF entiende el camino de una petición</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="web-http">○ Pendiente</button><button class="bookmark" data-bookmark="web-http">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un cliente puede ser un navegador, una app móvil, JavaScript o Postman. El servidor ejecuta Django. HTTP define cómo se envían solicitudes y respuestas.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Un cliente hace un pedido; el servidor lo recibe; la API decide qué hacer; la base de datos guarda o busca la información.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>DRF trabaja encima de HTTP. Si entiendes petición y respuesta, GET, POST y códigos de estado dejan de parecer comandos aislados.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/http.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+├── README.md
+└── docs/
+    └── http.md   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea docs/http.md.</div></li><li><span class="stepnum">2</span><div>Anota las partes de una URL: protocolo, host, puerto y ruta.</div></li><li><span class="stepnum">3</span><div>Relaciona GET con consultar y POST con crear.</div></li><li><span class="stepnum">4</span><div>Relaciona respuesta con status + headers + body.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>GET http://127.0.0.1:8000/api/estudiantes/
+
+Solicitud
+├── Método: GET
+├── Ruta: /api/estudiantes/
+└── Headers
+
+Respuesta
+├── Status: 200 OK
+├── Headers
+└── Body: JSON</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes distinguir cliente, servidor, petición y respuesta.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Clasifica estas acciones por método: listar estudiantes, crear estudiante, editar correo y eliminar estudiante.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="rest-json" data-title="rest, recursos y json" data-group="fundamentos web y api">
+      <div class="lesson-kicker">03 · FUNDAMENTOS WEB Y API</div>
+      <h2>REST, recursos y JSON</h2>
+      <p class="lead">Cómo diseñar una API entendible</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="rest-json">○ Pendiente</button><button class="bookmark" data-bookmark="rest-json">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>REST organiza la API alrededor de recursos. En nuestro caso los recursos son programas y estudiantes. JSON es el formato de datos que intercambiaremos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>En una biblioteca física tienes colecciones: libros, autores, préstamos. En una API tienes rutas para recursos: /libros/, /autores/, /prestamos/.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Antes de programar conviene definir qué nombres y rutas tendrá la API.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/diseno_api.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+└── docs/
+    ├── http.md
+    └── diseno_api.md   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Define los recursos programa y estudiante.</div></li><li><span class="stepnum">2</span><div>Usa sustantivos en plural para las rutas.</div></li><li><span class="stepnum">3</span><div>Diferencia colección /estudiantes/ de elemento /estudiantes/7/.</div></li><li><span class="stepnum">4</span><div>Escribe un JSON de ejemplo.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>GET    /api/estudiantes/      # lista
+POST   /api/estudiantes/      # crea
+GET    /api/estudiantes/7/    # detalle
+PUT    /api/estudiantes/7/    # reemplaza
+PATCH  /api/estudiantes/7/    # modifica parcialmente
+DELETE /api/estudiantes/7/    # elimina
+
+{
+  &quot;id&quot;: 7,
+  &quot;nombre&quot;: &quot;Ana&quot;,
+  &quot;correo&quot;: &quot;ana@example.com&quot;,
+  &quot;programa&quot;: 1
+}</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes saber qué cambia entre /estudiantes/ y /estudiantes/7/.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Diseña rutas REST para materias y docentes sin escribir Python todavía.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="bd-conceptos" data-title="base de datos, tabla, fila y columna" data-group="base de datos desde cero">
+      <div class="lesson-kicker">04 · BASE DE DATOS DESDE CERO</div>
+      <h2>Base de datos, tabla, fila y columna</h2>
+      <p class="lead">Las piezas mínimas de una base de datos relacional</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="bd-conceptos">○ Pendiente</button><button class="bookmark" data-bookmark="bd-conceptos">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Una base de datos organiza información. Una tabla agrupa datos del mismo tipo. Una fila representa un registro y una columna representa una característica.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Una hoja de cálculo ayuda a imaginarlo: las columnas son propiedades y cada fila es una entidad. La diferencia es que una base relacional aplica reglas, tipos y relaciones con mayor rigor.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Los modelos de Django terminarán convirtiéndose en tablas de PostgreSQL.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/modelo_datos.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+└── docs/
+    └── modelo_datos.md   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Dibuja la tabla programa.</div></li><li><span class="stepnum">2</span><div>Dibuja la tabla estudiante.</div></li><li><span class="stepnum">3</span><div>Marca id como identificador.</div></li><li><span class="stepnum">4</span><div>Evita mezclar varios conceptos en una sola columna.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>TABLA programa
++----+--------------------------+
+| id | nombre                   |
++----+--------------------------+
+|  1 | Ingeniería de Sistemas  |
+|  2 | Diseño Gráfico          |
++----+--------------------------+
+
+TABLA estudiante
++----+--------+-------------------+-------------+
+| id | nombre | correo            | programa_id |
++----+--------+-------------------+-------------+
+|  7 | Ana    | ana@example.com   | 1           |
++----+--------+-------------------+-------------+</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes poder señalar tabla, fila, columna y valor en el ejemplo.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Modela una tabla materia con al menos cinco columnas y escribe qué representa cada una.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="pk-fk" data-title="clave primaria y clave foránea" data-group="base de datos desde cero">
+      <div class="lesson-kicker">05 · BASE DE DATOS DESDE CERO</div>
+      <h2>Clave primaria y clave foránea</h2>
+      <p class="lead">Cómo se conectan las tablas</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="pk-fk">○ Pendiente</button><button class="bookmark" data-bookmark="pk-fk">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>La clave primaria identifica una fila de forma única. La clave foránea guarda el identificador de otra tabla y crea una relación.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El número de documento identifica a una persona; el código de un programa permite saber a qué programa pertenece un estudiante sin repetir todo el nombre del programa en cada fila.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>La relación Programa → Estudiante será la primera relación real del proyecto.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/modelo_datos.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>programa                 estudiante
+--------                 ----------
+id (PK)  &lt;────────────── programa_id (FK)
+nombre                   id (PK)
+                         nombre
+                         correo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Marca programa.id como PK.</div></li><li><span class="stepnum">2</span><div>Agrega estudiante.programa_id.</div></li><li><span class="stepnum">3</span><div>Haz que programa_id apunte a programa.id.</div></li><li><span class="stepnum">4</span><div>Entiende que muchos estudiantes pueden pertenecer a un programa.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>-- Idea SQL
+CREATE TABLE programa (
+  id BIGINT PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL
+);
+
+CREATE TABLE estudiante (
+  id BIGINT PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL,
+  programa_id BIGINT NOT NULL,
+  CONSTRAINT fk_estudiante_programa
+    FOREIGN KEY (programa_id) REFERENCES programa(id)
+);</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes explicar por qué programa_id no guarda el nombre completo del programa.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega una tabla materia y decide dónde pondrías una FK si cada materia pertenece a un programa.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="relaciones" data-title="relaciones 1:1, 1:n y n:m" data-group="base de datos desde cero">
+      <div class="lesson-kicker">06 · BASE DE DATOS DESDE CERO</div>
+      <h2>Relaciones 1:1, 1:N y N:M</h2>
+      <p class="lead">Aprende a elegir la relación correcta</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="relaciones">○ Pendiente</button><button class="bookmark" data-bookmark="relaciones">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Una relación 1:1 conecta un registro con uno. 1:N conecta uno con muchos. N:M conecta muchos con muchos mediante una tabla intermedia.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Persona-pasaporte puede ser 1:1; programa-estudiantes es 1:N; estudiantes-materias suele ser N:M.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Elegir mal una relación causa duplicación o limita el sistema.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/modelo_datos.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Programa 1 ───── N Estudiante
+Estudiante N ─── N Materia
+             │
+             └─ Matrícula (tabla puente)</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Identifica Programa → Estudiante como 1:N.</div></li><li><span class="stepnum">2</span><div>Imagina Estudiante ↔ Materia como N:M.</div></li><li><span class="stepnum">3</span><div>Crea conceptualmente la tabla Matricula.</div></li><li><span class="stepnum">4</span><div>No implementes Matricula todavía: primero entiende el patrón.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>matricula
++----+---------------+------------+
+| id | estudiante_id | materia_id |
++----+---------------+------------+
+|  1 | 7             | 3          |
+|  2 | 7             | 5          |
++----+---------------+------------+</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes reconocer cuándo necesitas una tabla intermedia.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Clasifica: usuario-perfil, departamento-empleados, estudiantes-cursos.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="tipos-restricciones" data-title="tipos, null, unique, default y check" data-group="base de datos desde cero">
+      <div class="lesson-kicker">07 · BASE DE DATOS DESDE CERO</div>
+      <h2>Tipos, NULL, UNIQUE, DEFAULT y CHECK</h2>
+      <p class="lead">Reglas que protegen la calidad de los datos</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="tipos-restricciones">○ Pendiente</button><button class="bookmark" data-bookmark="tipos-restricciones">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Los tipos indican qué puede guardar una columna. Las restricciones impiden datos inválidos o repetidos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Un formulario puede decir “solo números” o “correo obligatorio”. La base de datos también puede imponer reglas, incluso si la aplicación comete un error.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Correo será único, nombre obligatorio y estado tendrá un valor por defecto.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/modelo_datos.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>estudiante
+├── id BIGINT PK
+├── nombre VARCHAR NOT NULL
+├── correo VARCHAR UNIQUE NOT NULL
+├── activo BOOLEAN DEFAULT TRUE
+└── programa_id BIGINT FK</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Marca nombre como obligatorio.</div></li><li><span class="stepnum">2</span><div>Marca correo como único.</div></li><li><span class="stepnum">3</span><div>Agrega activo con valor inicial true.</div></li><li><span class="stepnum">4</span><div>Distingue NULL de cadena vacía.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>CREATE TABLE estudiante (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL,
+  correo VARCHAR(254) NOT NULL UNIQUE,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+  programa_id BIGINT NOT NULL REFERENCES programa(id)
+);</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes explicar qué error evita UNIQUE en correo.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Propón una restricción CHECK para una nota entre 0 y 5.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="normalizacion" data-title="normalización sin complicarse" data-group="base de datos desde cero">
+      <div class="lesson-kicker">08 · BASE DE DATOS DESDE CERO</div>
+      <h2>Normalización sin complicarse</h2>
+      <p class="lead">Evita repetir información innecesaria</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="normalizacion">○ Pendiente</button><button class="bookmark" data-bookmark="normalizacion">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Normalizar es organizar los datos para no repetir lo mismo muchas veces y para evitar inconsistencias. Para empezar basta con entender 1FN, 2FN y 3FN a nivel práctico.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Si guardas el nombre del programa en cada estudiante, un cambio de nombre obliga a actualizar cientos de filas. Separar Programa evita ese problema.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Nuestro diseño separa Programa y Estudiante porque representan entidades distintas.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/modelo_datos.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>ANTES
+estudiante(id, nombre, programa_nombre, programa_facultad)
+
+DESPUÉS
+programa(id, nombre, facultad)
+estudiante(id, nombre, programa_id)</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Busca datos repetidos.</div></li><li><span class="stepnum">2</span><div>Separa entidades que tienen vida propia.</div></li><li><span class="stepnum">3</span><div>Usa PK para identificar.</div></li><li><span class="stepnum">4</span><div>Usa FK para relacionar en vez de copiar datos.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>-- Evita
+(1, &#x27;Ana&#x27;, &#x27;Sistemas&#x27;, &#x27;Ingenierías&#x27;)
+(2, &#x27;Luis&#x27;, &#x27;Sistemas&#x27;, &#x27;Ingenierías&#x27;)
+
+-- Mejor
+programa:   (10, &#x27;Sistemas&#x27;, &#x27;Ingenierías&#x27;)
+estudiante: (1, &#x27;Ana&#x27;, 10)
+estudiante: (2, &#x27;Luis&#x27;, 10)</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes detectar qué dato se repetía innecesariamente.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Revisa una tabla ficticia pedido(cliente_nombre, cliente_telefono, producto_nombre, cantidad) y separa posibles entidades.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="sql-basico" data-title="sql: create, insert y select" data-group="sql básico">
+      <div class="lesson-kicker">09 · SQL BÁSICO</div>
+      <h2>SQL: CREATE, INSERT y SELECT</h2>
+      <p class="lead">Habla directamente con PostgreSQL</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="sql-basico">○ Pendiente</button><button class="bookmark" data-bookmark="sql-basico">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>SQL es el lenguaje con el que puedes definir y consultar datos. Django ORM generará SQL por ti, pero entender lo básico te ayuda a depurar.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El ORM es como un traductor: tú escribes Python y Django produce SQL. Saber algo de SQL te permite entender qué termina ejecutándose.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Antes de usar ORM practicarás operaciones simples en PostgreSQL.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 sql/01_basico.sql</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+└── sql/
+    └── 01_basico.sql   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea una tabla de práctica.</div></li><li><span class="stepnum">2</span><div>Inserta dos filas.</div></li><li><span class="stepnum">3</span><div>Consulta todas.</div></li><li><span class="stepnum">4</span><div>Consulta solo algunas columnas.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>CREATE TABLE practica_programa (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL
+);
+
+INSERT INTO practica_programa(nombre) VALUES (&#x27;Sistemas&#x27;);
+INSERT INTO practica_programa(nombre) VALUES (&#x27;Diseño&#x27;);
+
+SELECT * FROM practica_programa;
+SELECT id, nombre FROM practica_programa;</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>La consulta debe devolver las dos filas insertadas.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un tercer programa y consulta únicamente su nombre.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="sql-filtros" data-title="where, order by, update y delete" data-group="sql básico">
+      <div class="lesson-kicker">10 · SQL BÁSICO</div>
+      <h2>WHERE, ORDER BY, UPDATE y DELETE</h2>
+      <p class="lead">Filtrar y modificar datos con cuidado</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="sql-filtros">○ Pendiente</button><button class="bookmark" data-bookmark="sql-filtros">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>WHERE selecciona filas. ORDER BY ordena. UPDATE modifica. DELETE elimina. Sin WHERE, UPDATE o DELETE pueden afectar muchas filas.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>WHERE es como decir “solo los estudiantes activos”. Si olvidas esa condición, la instrucción puede aplicarse a todos.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Estos conceptos equivaldrán luego a filter(), order_by(), save() y delete() del ORM.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 sql/02_crud.sql</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>sql/
+├── 01_basico.sql
+└── 02_crud.sql   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Filtra por nombre.</div></li><li><span class="stepnum">2</span><div>Ordena alfabéticamente.</div></li><li><span class="stepnum">3</span><div>Actualiza una fila usando WHERE.</div></li><li><span class="stepnum">4</span><div>Elimina una fila específica usando WHERE.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>SELECT * FROM practica_programa
+WHERE nombre = &#x27;Sistemas&#x27;;
+
+SELECT * FROM practica_programa
+ORDER BY nombre ASC;
+
+UPDATE practica_programa
+SET nombre = &#x27;Ingeniería de Sistemas&#x27;
+WHERE id = 1;
+
+DELETE FROM practica_programa
+WHERE id = 2;</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Antes de ejecutar DELETE debes poder decir exactamente qué fila se eliminará.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Escribe un UPDATE que cambie un nombre solo cuando id sea 3.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="sql-join" data-title="join y group by" data-group="sql básico">
+      <div class="lesson-kicker">11 · SQL BÁSICO</div>
+      <h2>JOIN y GROUP BY</h2>
+      <p class="lead">Consulta información relacionada</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="sql-join">○ Pendiente</button><button class="bookmark" data-bookmark="sql-join">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>JOIN combina filas de tablas relacionadas. GROUP BY reúne filas para calcular totales, conteos o promedios.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>La FK guarda solo un id. JOIN te permite volver a mostrar datos legibles de ambas tablas.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Luego usarás select_related() y agregaciones del ORM.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 sql/03_join.sql</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>programa 1 ───── N estudiante
+         JOIN por programa_id</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Relaciona estudiante.programa_id con programa.id.</div></li><li><span class="stepnum">2</span><div>Selecciona nombre del estudiante y nombre del programa.</div></li><li><span class="stepnum">3</span><div>Cuenta cuántos estudiantes hay por programa.</div></li><li><span class="stepnum">4</span><div>Entiende que INNER JOIN muestra coincidencias existentes.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>SELECT e.nombre AS estudiante, p.nombre AS programa
+FROM estudiante e
+INNER JOIN programa p ON p.id = e.programa_id;
+
+SELECT p.nombre, COUNT(e.id) AS total
+FROM programa p
+LEFT JOIN estudiante e ON e.programa_id = p.id
+GROUP BY p.id, p.nombre
+ORDER BY p.nombre;</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes explicar para qué sirve ON p.id = e.programa_id.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Escribe conceptualmente un JOIN entre materia y programa.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="postgres-instalar" data-title="instalar postgresql y reconocer sus herramientas" data-group="postgresql">
+      <div class="lesson-kicker">12 · POSTGRESQL</div>
+      <h2>Instalar PostgreSQL y reconocer sus herramientas</h2>
+      <p class="lead">Servidor, puerto, usuario, base y cliente</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="postgres-instalar">○ Pendiente</button><button class="bookmark" data-bookmark="postgres-instalar">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>PostgreSQL es el motor de base de datos. El servidor suele escuchar en el puerto 5432. Puedes conectarte con psql, pgAdmin u otro cliente.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>PostgreSQL es el almacén; psql y pgAdmin son diferentes puertas para administrar ese almacén.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Django se conectará al servidor PostgreSQL, no a un archivo local de SQLite.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/postgresql.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>PostgreSQL Server
+├── puerto 5432
+├── rol postgres
+└── bases de datos</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Instala una versión soportada de PostgreSQL.</div></li><li><span class="stepnum">2</span><div>Recuerda la contraseña del rol administrador.</div></li><li><span class="stepnum">3</span><div>Verifica que el servicio esté iniciado.</div></li><li><span class="stepnum">4</span><div>Prueba la conexión con psql o pgAdmin.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>psql --version
+
+# Entrar con el usuario administrador
+psql -U postgres -h localhost -p 5432
+
+# Dentro de psql
+SELECT version();</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes obtener la versión del servidor sin error de conexión.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Identifica en tu instalación: host, puerto, usuario y nombre de una base de datos.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="postgres-comandos" data-title="psql: comandos esenciales" data-group="postgresql">
+      <div class="lesson-kicker">13 · POSTGRESQL</div>
+      <h2>psql: comandos esenciales</h2>
+      <p class="lead">Muévete por PostgreSQL sin miedo</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="postgres-comandos">○ Pendiente</button><button class="bookmark" data-bookmark="postgres-comandos">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>psql tiene comandos propios que empiezan por barra invertida. No son SQL, pero sirven para explorar.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>SQL consulta datos; los comandos de psql ayudan a navegar el entorno.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Cuando algo falle podrás comprobar si la base, tablas y usuario existen.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/postgresql.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>psql
+├── \l      bases
+├── \c      conectar
+├── \dt     tablas
+├── \d      describir
+└── \q      salir</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Lista bases con \l.</div></li><li><span class="stepnum">2</span><div>Conéctate con \c nombre_db.</div></li><li><span class="stepnum">3</span><div>Lista tablas con \dt.</div></li><li><span class="stepnum">4</span><div>Describe una tabla con \d nombre.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>\l
+\c api_academia_db
+\dt
+\d academia_estudiante
+\q</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes diferenciar \dt de SELECT * FROM tabla;.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea una chuleta personal con 6 comandos de psql y su función.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="postgres-db-user" data-title="crear usuario y base del proyecto" data-group="postgresql">
+      <div class="lesson-kicker">14 · POSTGRESQL</div>
+      <h2>Crear usuario y base del proyecto</h2>
+      <p class="lead">No uses el superusuario para tu aplicación</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="postgres-db-user">○ Pendiente</button><button class="bookmark" data-bookmark="postgres-db-user">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>La aplicación debe conectarse con un rol propio y una base propia. Así limitas permisos y separas proyectos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>No entregarías la llave maestra del edificio a cada aplicación; creas una llave específica para su espacio.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>api_academia tendrá un rol y una base exclusivos.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 sql/00_crear_bd.sql</span><span class="file-chip">📄 .env.example</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>PostgreSQL
+├── role: api_academia_user
+└── db:   api_academia_db</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Entra como administrador.</div></li><li><span class="stepnum">2</span><div>Crea el rol con LOGIN.</div></li><li><span class="stepnum">3</span><div>Crea la base y asigna el propietario.</div></li><li><span class="stepnum">4</span><div>Verifica conexión con el nuevo rol.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>CREATE ROLE api_academia_user
+WITH LOGIN PASSWORD &#x27;cambia_esta_clave&#x27;;
+
+CREATE DATABASE api_academia_db
+OWNER api_academia_user;
+
+-- Desde terminal
+psql -U api_academia_user -h localhost -d api_academia_db</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>El nuevo usuario debe poder conectarse a api_academia_db.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Explica por qué conviene que cada proyecto tenga su propio usuario de BD.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="entorno" data-title="python, entorno virtual e instalación" data-group="django + drf">
+      <div class="lesson-kicker">15 · DJANGO + DRF</div>
+      <h2>Python, entorno virtual e instalación</h2>
+      <p class="lead">Prepara un entorno limpio</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="entorno">○ Pendiente</button><button class="bookmark" data-bookmark="entorno">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un entorno virtual aísla las dependencias del proyecto. Instalaremos Django, DRF, psycopg y python-dotenv.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Es una caja de herramientas exclusiva para este proyecto; evita mezclar versiones con otros proyectos.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>A partir de aquí comienza el proyecto ejecutable.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 requirements.txt</span><span class="file-chip">📄 .venv/</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+├── .venv/        ← entorno local
+└── requirements.txt</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Comprueba Python 3.12 o superior.</div></li><li><span class="stepnum">2</span><div>Crea .venv.</div></li><li><span class="stepnum">3</span><div>Activa el entorno.</div></li><li><span class="stepnum">4</span><div>Actualiza pip e instala dependencias.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>python --version
+python -m venv .venv
+
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# Linux/macOS
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install &quot;Django&gt;=6.1,&lt;6.2&quot; &quot;djangorestframework&gt;=3.18,&lt;3.19&quot; &quot;psycopg[binary]&gt;=3.1.12&quot; &quot;python-dotenv&gt;=1.0&quot;
+pip freeze &gt; requirements.txt</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>python -m django --version debe mostrar Django 6.1.x.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Desactiva y vuelve a activar el entorno para comprobar que entiendes dónde están las dependencias.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="crear-proyecto" data-title="crear el proyecto y la app" data-group="django + drf">
+      <div class="lesson-kicker">16 · DJANGO + DRF</div>
+      <h2>Crear el proyecto y la app</h2>
+      <p class="lead">config contiene configuración; academia contiene el dominio</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="crear-proyecto">○ Pendiente</button><button class="bookmark" data-bookmark="crear-proyecto">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>El proyecto Django guarda la configuración general. Una app agrupa una parte funcional del sistema.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El proyecto es el edificio; la app academia es un área especializada dentro del edificio.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Separaremos configuración de reglas del dominio académico.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 manage.py</span><span class="file-chip">📄 config/</span><span class="file-chip">📄 academia/</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+├── manage.py
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   └── ...
+└── academia/
+    ├── models.py
+    ├── views.py
+    └── ...</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Ejecuta startproject en la carpeta actual.</div></li><li><span class="stepnum">2</span><div>Crea la app academia.</div></li><li><span class="stepnum">3</span><div>Revisa los archivos generados.</div></li><li><span class="stepnum">4</span><div>No borres los archivos __init__.py.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>django-admin startproject config .
+python manage.py startapp academia
+
+# Verifica
+python manage.py check</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>python manage.py check debe terminar sin errores.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Explica con tus palabras la diferencia entre config/ y academia/.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="settings-postgres" data-title="conectar django con postgresql" data-group="django + drf">
+      <div class="lesson-kicker">17 · DJANGO + DRF</div>
+      <h2>Conectar Django con PostgreSQL</h2>
+      <p class="lead">settings.py + variables de entorno</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="settings-postgres">○ Pendiente</button><button class="bookmark" data-bookmark="settings-postgres">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Django necesita saber qué motor, base, usuario, contraseña, host y puerto debe usar.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Son los datos de dirección y acceso para llegar al servidor PostgreSQL.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Desde esta lección, las migraciones crearán tablas en PostgreSQL.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 config/settings.py</span><span class="file-chip">📄 .env</span><span class="file-chip">📄 .env.example</span><span class="file-chip">📄 .gitignore</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+├── .env              ← NO subir
+├── .env.example      ← sí subir
+├── .gitignore
+└── config/
+    └── settings.py   ← editas</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea .env con tus datos reales.</div></li><li><span class="stepnum">2</span><div>Carga .env con python-dotenv.</div></li><li><span class="stepnum">3</span><div>Cambia DATABASES a django.db.backends.postgresql.</div></li><li><span class="stepnum">4</span><div>Agrega rest_framework y academia a INSTALLED_APPS.</div></li><li><span class="stepnum">5</span><div>Ignora .env en Git.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># .env
+DB_NAME=api_academia_db
+DB_USER=api_academia_user
+DB_PASSWORD=cambia_esta_clave
+DB_HOST=localhost
+DB_PORT=5432
+
+# config/settings.py
+import os
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / &#x27;.env&#x27;)
+
+INSTALLED_APPS += [
+    &#x27;rest_framework&#x27;,
+    &#x27;academia&#x27;,
+]
+
+DATABASES = {
+    &#x27;default&#x27;: {
+        &#x27;ENGINE&#x27;: &#x27;django.db.backends.postgresql&#x27;,
+        &#x27;NAME&#x27;: os.getenv(&#x27;DB_NAME&#x27;),
+        &#x27;USER&#x27;: os.getenv(&#x27;DB_USER&#x27;),
+        &#x27;PASSWORD&#x27;: os.getenv(&#x27;DB_PASSWORD&#x27;),
+        &#x27;HOST&#x27;: os.getenv(&#x27;DB_HOST&#x27;, &#x27;localhost&#x27;),
+        &#x27;PORT&#x27;: os.getenv(&#x27;DB_PORT&#x27;, &#x27;5432&#x27;),
+    }
+}</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>python manage.py check debe funcionar; si la conexión está mal, migrate mostrará el problema.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Cambia temporalmente DB_NAME por un nombre inexistente, observa el error y luego restáuralo.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="modelo-programa" data-title="primer modelo: programa" data-group="modelos y orm">
+      <div class="lesson-kicker">18 · MODELOS Y ORM</div>
+      <h2>Primer modelo: Programa</h2>
+      <p class="lead">De una clase Python a una tabla</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="modelo-programa">○ Pendiente</button><button class="bookmark" data-bookmark="modelo-programa">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un Model de Django describe una entidad y sus campos. Una migración traduce cambios del modelo a operaciones de base de datos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>models.py es el plano; la migración es la orden de construcción; PostgreSQL contiene la estructura ya construida.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Programa será la tabla padre de Estudiante.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/models.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>academia/
+└── models.py   ← Programa</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Importa models.</div></li><li><span class="stepnum">2</span><div>Crea Programa.</div></li><li><span class="stepnum">3</span><div>Usa CharField para nombre.</div></li><li><span class="stepnum">4</span><div>Agrega __str__ para mostrarlo mejor en admin y consola.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from django.db import models
+
+class Programa(models.Model):
+    nombre = models.CharField(max_length=120, unique=True)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = [&#x27;nombre&#x27;]
+
+    def __str__(self):
+        return self.nombre</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>python manage.py makemigrations debe detectar la creación de Programa.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un campo codigo de máximo 20 caracteres y hazlo único.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="modelo-estudiante" data-title="modelo estudiante y foreignkey" data-group="modelos y orm">
+      <div class="lesson-kicker">19 · MODELOS Y ORM</div>
+      <h2>Modelo Estudiante y ForeignKey</h2>
+      <p class="lead">Implementa la relación 1:N</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="modelo-estudiante">○ Pendiente</button><button class="bookmark" data-bookmark="modelo-estudiante">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>ForeignKey representa una relación muchos-a-uno. Cada estudiante apunta a un programa.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El estudiante guarda la referencia al programa, no una copia completa de todos sus datos.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Aquí el concepto de FK de la base de datos se convierte en código Django.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/models.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Programa 1 ───── N Estudiante
+                  ├── nombre
+                  ├── correo UNIQUE
+                  ├── activo
+                  └── programa FK</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea Estudiante debajo de Programa.</div></li><li><span class="stepnum">2</span><div>Usa EmailField(unique=True).</div></li><li><span class="stepnum">3</span><div>Crea ForeignKey a Programa.</div></li><li><span class="stepnum">4</span><div>Usa on_delete=PROTECT para impedir borrar un programa con estudiantes.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>class Estudiante(models.Model):
+    nombre = models.CharField(max_length=120)
+    correo = models.EmailField(unique=True)
+    activo = models.BooleanField(default=True)
+    programa = models.ForeignKey(
+        Programa,
+        on_delete=models.PROTECT,
+        related_name=&#x27;estudiantes&#x27;,
+    )
+
+    class Meta:
+        ordering = [&#x27;nombre&#x27;]
+
+    def __str__(self):
+        return f&#x27;{self.nombre} - {self.correo}&#x27;</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes poder explicar qué hace on_delete=PROTECT y related_name.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Prueba mentalmente qué cambiaría con CASCADE y por qué puede ser peligroso.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="migraciones" data-title="migraciones: makemigrations y migrate" data-group="modelos y orm">
+      <div class="lesson-kicker">20 · MODELOS Y ORM</div>
+      <h2>Migraciones: makemigrations y migrate</h2>
+      <p class="lead">Lleva los modelos a PostgreSQL</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="migraciones">○ Pendiente</button><button class="bookmark" data-bookmark="migraciones">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>makemigrations crea archivos que describen cambios. migrate ejecuta esos cambios en la base.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Primero redactas la obra que quieres hacer; después la ejecutas.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Hasta ahora los modelos existen en Python, pero PostgreSQL aún necesita sus tablas.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/migrations/0001_initial.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>academia/
+└── migrations/
+    └── 0001_initial.py   ← generado</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Ejecuta makemigrations.</div></li><li><span class="stepnum">2</span><div>Revisa el archivo generado.</div></li><li><span class="stepnum">3</span><div>Ejecuta migrate.</div></li><li><span class="stepnum">4</span><div>Abre psql y verifica tablas academia_programa y academia_estudiante.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>python manage.py makemigrations
+python manage.py migrate
+python manage.py showmigrations
+
+# psql
+\dt
+\d academia_estudiante</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>\dt debe mostrar las tablas creadas por Django.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un campo fecha_creacion con auto_now_add=True y genera una segunda migración.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="orm" data-title="orm: crear, consultar, filtrar y actualizar" data-group="modelos y orm">
+      <div class="lesson-kicker">21 · MODELOS Y ORM</div>
+      <h2>ORM: crear, consultar, filtrar y actualizar</h2>
+      <p class="lead">Python que termina convirtiéndose en SQL</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="orm">○ Pendiente</button><button class="bookmark" data-bookmark="orm">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>El ORM permite trabajar con objetos Python en lugar de escribir SQL para cada operación.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Es el traductor entre tu código Python y PostgreSQL.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Las views de la API usarán QuerySets para obtener datos.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 Django shell</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Python ORM
+   ↓
+Django
+   ↓
+SQL
+   ↓
+PostgreSQL</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Abre shell.</div></li><li><span class="stepnum">2</span><div>Crea un Programa.</div></li><li><span class="stepnum">3</span><div>Crea un Estudiante relacionado.</div></li><li><span class="stepnum">4</span><div>Filtra activos.</div></li><li><span class="stepnum">5</span><div>Mira query para observar el SQL aproximado.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>python manage.py shell
+
+from academia.models import Programa, Estudiante
+
+p = Programa.objects.create(nombre=&#x27;Ingeniería de Sistemas&#x27;)
+Estudiante.objects.create(
+    nombre=&#x27;Ana Torres&#x27;,
+    correo=&#x27;ana@example.com&#x27;,
+    programa=p,
+)
+
+qs = Estudiante.objects.filter(activo=True)
+print(qs)
+print(qs.query)</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Estudiante.objects.count() debe devolver al menos 1 después de crear el ejemplo.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Filtra estudiantes cuyo nombre contenga ana sin importar mayúsculas usando nombre__icontains.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="select-related" data-title="consultas relacionadas: select_related" data-group="modelos y orm">
+      <div class="lesson-kicker">22 · MODELOS Y ORM</div>
+      <h2>Consultas relacionadas: select_related</h2>
+      <p class="lead">Evita consultas innecesarias</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="select-related">○ Pendiente</button><button class="bookmark" data-bookmark="select-related">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Cuando vas a usar la FK programa de muchos estudiantes, select_related puede traer los datos relacionados en una sola consulta JOIN.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>En vez de ir al almacén una vez por cada estudiante, traes de una vez la información relacionada que necesitas.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Es una optimización sencilla y visible en nuestro ViewSet.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Estudiante.objects
+└── select_related(&#x27;programa&#x27;)
+    └── SQL JOIN</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Compara un queryset normal.</div></li><li><span class="stepnum">2</span><div>Agrega select_related(programa).</div></li><li><span class="stepnum">3</span><div>Inspecciona query.</div></li><li><span class="stepnum">4</span><div>Entiende que aplica bien a ForeignKey y OneToOne.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>qs = Estudiante.objects.select_related(&#x27;programa&#x27;).all()
+
+for estudiante in qs:
+    print(estudiante.nombre, estudiante.programa.nombre)
+
+print(qs.query)</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes saber por qué select_related se usa para programa y no para una relación ManyToMany genérica.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Investiga conceptualmente para qué serviría prefetch_related en una N:M.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="serializers" data-title="serializer: de modelo a json" data-group="django rest framework">
+      <div class="lesson-kicker">23 · DJANGO REST FRAMEWORK</div>
+      <h2>Serializer: de modelo a JSON</h2>
+      <p class="lead">La pieza que valida y transforma datos</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="serializers">○ Pendiente</button><button class="bookmark" data-bookmark="serializers">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un serializer convierte objetos Django a tipos que pueden representarse como JSON y también valida datos recibidos antes de crear o actualizar modelos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Es un traductor y un control de calidad al mismo tiempo.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Sin serializer la API no sabe cómo exponer ni validar un Estudiante de forma cómoda.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/serializers.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>academia/
+├── models.py
+└── serializers.py   ← nuevo</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea serializers.py.</div></li><li><span class="stepnum">2</span><div>Crea ProgramaSerializer.</div></li><li><span class="stepnum">3</span><div>Crea EstudianteSerializer.</div></li><li><span class="stepnum">4</span><div>Incluye los campos que quieres exponer.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from rest_framework import serializers
+from .models import Programa, Estudiante
+
+class ProgramaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Programa
+        fields = [&#x27;id&#x27;, &#x27;nombre&#x27;, &#x27;activo&#x27;]
+
+class EstudianteSerializer(serializers.ModelSerializer):
+    programa_nombre = serializers.CharField(
+        source=&#x27;programa.nombre&#x27;,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Estudiante
+        fields = [
+            &#x27;id&#x27;, &#x27;nombre&#x27;, &#x27;correo&#x27;, &#x27;activo&#x27;,
+            &#x27;programa&#x27;, &#x27;programa_nombre&#x27;,
+        ]</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes entender por qué programa se escribe y programa_nombre es solo lectura.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un campo solo lectura llamado estado_texto que devuelva Activo o Inactivo usando SerializerMethodField.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="api-view" data-title="tu primera vista de api con @api_view" data-group="django rest framework">
+      <div class="lesson-kicker">24 · DJANGO REST FRAMEWORK</div>
+      <h2>Tu primera vista de API con @api_view</h2>
+      <p class="lead">GET sencillo antes de automatizar CRUD</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="api-view">○ Pendiente</button><button class="bookmark" data-bookmark="api-view">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>@api_view convierte una función en una vista de DRF y te da Request, Response, negociación de contenido y manejo de métodos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Primero construiremos una puerta manual para entender qué ocurre antes de usar ViewSets.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Si saltas directamente a ModelViewSet, el framework puede parecer magia.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span><span class="file-chip">📄 academia/urls.py</span><span class="file-chip">📄 config/urls.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>GET /api/saludo/
+      ↓
+academia.urls
+      ↓
+views.saludo
+      ↓
+Response JSON</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea saludo en views.py.</div></li><li><span class="stepnum">2</span><div>Crea academia/urls.py.</div></li><li><span class="stepnum">3</span><div>Incluye las URLs en config/urls.py.</div></li><li><span class="stepnum">4</span><div>Inicia runserver y abre /api/saludo/.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># academia/views.py
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view([&#x27;GET&#x27;])
+def saludo(request):
+    return Response({
+        &#x27;mensaje&#x27;: &#x27;API Academia funcionando&#x27;
+    })
+
+# academia/urls.py
+from django.urls import path
+from .views import saludo
+
+urlpatterns = [
+    path(&#x27;saludo/&#x27;, saludo),
+]
+
+# config/urls.py
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path(&#x27;admin/&#x27;, admin.site.urls),
+    path(&#x27;api/&#x27;, include(&#x27;academia.urls&#x27;)),
+]</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>GET http://127.0.0.1:8000/api/saludo/ debe devolver JSON y 200.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea /api/info/ que devuelva nombre del proyecto y versión de la API.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="list-create" data-title="listar y crear estudiantes manualmente" data-group="django rest framework">
+      <div class="lesson-kicker">25 · DJANGO REST FRAMEWORK</div>
+      <h2>Listar y crear estudiantes manualmente</h2>
+      <p class="lead">Entiende GET, POST, validación y status</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="list-create">○ Pendiente</button><button class="bookmark" data-bookmark="list-create">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Con una función puedes manejar varios métodos. En GET serializas un queryset; en POST validas request.data y guardas.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>GET mira el inventario; POST entrega datos nuevos para crear una fila.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Este paso hace visible lo que luego ModelViewSet automatizará.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span><span class="file-chip">📄 academia/urls.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>GET/POST /api/estudiantes-manual/
+      ↓
+request.method
+      ↓
+Serializer
+      ↓
+ORM / PostgreSQL</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Agrega el endpoint manual.</div></li><li><span class="stepnum">2</span><div>En GET usa many=True.</div></li><li><span class="stepnum">3</span><div>En POST pasa request.data al serializer.</div></li><li><span class="stepnum">4</span><div>Usa is_valid(raise_exception=True).</div></li><li><span class="stepnum">5</span><div>Devuelve 201 al crear.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from rest_framework import status
+from .models import Estudiante
+from .serializers import EstudianteSerializer
+
+@api_view([&#x27;GET&#x27;, &#x27;POST&#x27;])
+def estudiantes_manual(request):
+    if request.method == &#x27;GET&#x27;:
+        qs = Estudiante.objects.select_related(&#x27;programa&#x27;).all()
+        return Response(EstudianteSerializer(qs, many=True).data)
+
+    serializer = EstudianteSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Envía POST válido y luego GET: el nuevo estudiante debe aparecer.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Envía un correo repetido y observa el error generado por unique=True.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="viewset-router" data-title="modelviewset + router" data-group="django rest framework">
+      <div class="lesson-kicker">26 · DJANGO REST FRAMEWORK</div>
+      <h2>ModelViewSet + Router</h2>
+      <p class="lead">CRUD completo con poco código, pero ahora entendiendo qué automatiza</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="viewset-router">○ Pendiente</button><button class="bookmark" data-bookmark="viewset-router">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>ModelViewSet reúne list, create, retrieve, update, partial_update y destroy. Un Router genera las rutas REST estándar.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Después de construir una puerta manual, usas un sistema modular que instala las puertas estándar por ti.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Será la estructura final de nuestra API.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span><span class="file-chip">📄 academia/urls.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>DefaultRouter
+├── /programas/
+├── /programas/{id}/
+├── /estudiantes/
+└── /estudiantes/{id}/</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea ProgramaViewSet.</div></li><li><span class="stepnum">2</span><div>Crea EstudianteViewSet.</div></li><li><span class="stepnum">3</span><div>Usa select_related en estudiantes.</div></li><li><span class="stepnum">4</span><div>Registra ambos en DefaultRouter.</div></li><li><span class="stepnum">5</span><div>Quita o conserva las rutas manuales solo para aprendizaje.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># academia/views.py
+from rest_framework import viewsets
+from .models import Programa, Estudiante
+from .serializers import ProgramaSerializer, EstudianteSerializer
+
+class ProgramaViewSet(viewsets.ModelViewSet):
+    queryset = Programa.objects.all()
+    serializer_class = ProgramaSerializer
+
+class EstudianteViewSet(viewsets.ModelViewSet):
+    queryset = Estudiante.objects.select_related(&#x27;programa&#x27;).all()
+    serializer_class = EstudianteSerializer
+
+# academia/urls.py
+from rest_framework.routers import DefaultRouter
+from .views import ProgramaViewSet, EstudianteViewSet
+
+router = DefaultRouter()
+router.register(&#x27;programas&#x27;, ProgramaViewSet)
+router.register(&#x27;estudiantes&#x27;, EstudianteViewSet)
+
+urlpatterns = router.urls</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Abre /api/ y revisa las rutas generadas por el Browsable API.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un recurso Materia usando el mismo patrón Model + Serializer + ViewSet + Router.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="crud-rutas" data-title="crud completo y rutas exactas" data-group="django rest framework">
+      <div class="lesson-kicker">27 · DJANGO REST FRAMEWORK</div>
+      <h2>CRUD completo y rutas exactas</h2>
+      <p class="lead">Qué método usar en cada operación</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="crud-rutas">○ Pendiente</button><button class="bookmark" data-bookmark="crud-rutas">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>CRUD significa Create, Read, Update y Delete. REST asigna estas acciones a métodos HTTP y rutas.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Una colección usa la ruta plural; un elemento concreto agrega su id.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Los estudiantes deben saber qué URL probar y qué respuesta esperar.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/urls.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>/api/estudiantes/
+├── GET    lista
+└── POST   crea
+
+/api/estudiantes/{id}/
+├── GET    detalle
+├── PUT    reemplaza
+├── PATCH  modifica
+└── DELETE elimina</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Prueba GET colección.</div></li><li><span class="stepnum">2</span><div>Prueba POST colección.</div></li><li><span class="stepnum">3</span><div>Prueba GET detalle.</div></li><li><span class="stepnum">4</span><div>Prueba PATCH cambiando solo activo.</div></li><li><span class="stepnum">5</span><div>Prueba DELETE sobre un registro de prueba.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># Crear
+POST /api/estudiantes/
+{
+  &quot;nombre&quot;: &quot;Luis Pérez&quot;,
+  &quot;correo&quot;: &quot;luis@example.com&quot;,
+  &quot;activo&quot;: true,
+  &quot;programa&quot;: 1
+}
+
+# Actualizar parcialmente
+PATCH /api/estudiantes/2/
+{
+  &quot;activo&quot;: false
+}</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes poder elegir el método correcto sin mirar una tabla.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Escribe cinco casos de prueba manuales para CRUD, incluyendo al menos dos errores.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="status-errors" data-title="códigos http y errores" data-group="api bien diseñada">
+      <div class="lesson-kicker">28 · API BIEN DISEÑADA</div>
+      <h2>Códigos HTTP y errores</h2>
+      <p class="lead">Una API también comunica con su status</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="status-errors">○ Pendiente</button><button class="bookmark" data-bookmark="status-errors">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>El status indica el resultado general: 200 consulta correcta, 201 creación, 204 eliminación, 400 datos inválidos, 401 sin autenticar, 403 sin permiso, 404 no encontrado.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El body explica detalles; el status es una señal corta y estándar del resultado.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Un frontend o app móvil suele tomar decisiones según estos códigos.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/http.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Respuesta HTTP
+├── status
+├── headers
+└── body JSON</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Prueba crear un estudiante correcto.</div></li><li><span class="stepnum">2</span><div>Prueba correo inválido.</div></li><li><span class="stepnum">3</span><div>Consulta un id inexistente.</div></li><li><span class="stepnum">4</span><div>Elimina un registro y observa 204.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>201 Created
+{ &quot;id&quot;: 8, &quot;nombre&quot;: &quot;Luis&quot;, ... }
+
+400 Bad Request
+{ &quot;correo&quot;: [&quot;Enter a valid email address.&quot;] }
+
+404 Not Found
+{ &quot;detail&quot;: &quot;No Estudiante matches the given query.&quot; }</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes explicar por qué un error de validación normalmente es 400 y no 500.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Relaciona estos casos con status: login requerido, permiso insuficiente, registro inexistente, creación correcta.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="validacion" data-title="validación personalizada" data-group="api bien diseñada">
+      <div class="lesson-kicker">29 · API BIEN DISEÑADA</div>
+      <h2>Validación personalizada</h2>
+      <p class="lead">Reglas del negocio en el serializer</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="validacion">○ Pendiente</button><button class="bookmark" data-bookmark="validacion">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Los campos validan formato y restricciones, pero a veces el negocio necesita reglas adicionales. Puedes usar validate_campo o validate.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>EmailField sabe qué parece un correo; tu regla de negocio decide, por ejemplo, que un estudiante inactivo no puede cambiarse a cierto estado sin condición.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>No toda regla puede expresarse solo con el tipo de columna.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/serializers.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>request.data
+   ↓
+Serializer
+├── validación de campos
+├── validate_&lt;campo&gt;
+└── validate
+   ↓
+serializer.save()</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Agrega validate_nombre.</div></li><li><span class="stepnum">2</span><div>Limpia espacios.</div></li><li><span class="stepnum">3</span><div>Impide nombres demasiado cortos.</div></li><li><span class="stepnum">4</span><div>Prueba respuestas 400.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>class EstudianteSerializer(serializers.ModelSerializer):
+    # ... Meta y campos ...
+
+    def validate_nombre(self, value):
+        value = value.strip()
+        if len(value) &lt; 3:
+            raise serializers.ValidationError(
+                &#x27;El nombre debe tener al menos 3 caracteres.&#x27;
+            )
+        return value</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>POST con nombre “Al” debe responder 400 con mensaje claro.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea una validación para impedir correos del dominio ejemplo-invalido.test.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="filtros" data-title="filtros simples por query params" data-group="api bien diseñada">
+      <div class="lesson-kicker">30 · API BIEN DISEÑADA</div>
+      <h2>Filtros simples por query params</h2>
+      <p class="lead">?activo=true&amp;programa=1</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="filtros">○ Pendiente</button><button class="bookmark" data-bookmark="filtros">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un query parameter permite modificar una consulta sin crear una ruta nueva.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>La ruta sigue siendo estudiantes; los parámetros son filtros opcionales aplicados a la lista.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Es un paso sencillo antes de introducir paquetes de filtrado adicionales.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>GET /api/estudiantes/?activo=true&amp;programa=1
+                             ↓
+                         get_queryset</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Sobrescribe get_queryset.</div></li><li><span class="stepnum">2</span><div>Lee request.query_params.</div></li><li><span class="stepnum">3</span><div>Filtra solo si el parámetro llegó.</div></li><li><span class="stepnum">4</span><div>Mantén select_related.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>class EstudianteViewSet(viewsets.ModelViewSet):
+    serializer_class = EstudianteSerializer
+
+    def get_queryset(self):
+        qs = Estudiante.objects.select_related(&#x27;programa&#x27;).all()
+        activo = self.request.query_params.get(&#x27;activo&#x27;)
+        programa = self.request.query_params.get(&#x27;programa&#x27;)
+
+        if activo in {&#x27;true&#x27;, &#x27;false&#x27;}:
+            qs = qs.filter(activo=(activo == &#x27;true&#x27;))
+        if programa:
+            qs = qs.filter(programa_id=programa)
+        return qs</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>GET /api/estudiantes/?activo=true debe devolver solo activos.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un parámetro nombre que filtre con nombre__icontains.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="paginacion" data-title="paginación" data-group="api bien diseñada">
+      <div class="lesson-kicker">31 · API BIEN DISEÑADA</div>
+      <h2>Paginación</h2>
+      <p class="lead">No envíes miles de filas en una sola respuesta</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="paginacion">○ Pendiente</button><button class="bookmark" data-bookmark="paginacion">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>La paginación divide una colección grande en páginas. DRF puede configurarla globalmente.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Como un libro: no cargas todas las páginas en la pantalla al mismo tiempo.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Es una práctica básica cuando una tabla puede crecer.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 config/settings.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>GET /api/estudiantes/?page=2
+
+{
+  count, next, previous, results[]
+}</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Agrega REST_FRAMEWORK.</div></li><li><span class="stepnum">2</span><div>Elige PageNumberPagination.</div></li><li><span class="stepnum">3</span><div>Configura PAGE_SIZE pequeño para practicar.</div></li><li><span class="stepnum">4</span><div>Crea varios estudiantes y cambia page.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>REST_FRAMEWORK = {
+    &#x27;DEFAULT_PAGINATION_CLASS&#x27;:
+        &#x27;rest_framework.pagination.PageNumberPagination&#x27;,
+    &#x27;PAGE_SIZE&#x27;: 5,
+}</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>La lista debe devolver count, next, previous y results.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea 12 registros de prueba y calcula cuántas páginas aparecen con PAGE_SIZE=5.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="auth" data-title="autenticación y permisos" data-group="seguridad básica">
+      <div class="lesson-kicker">32 · SEGURIDAD BÁSICA</div>
+      <h2>Autenticación y permisos</h2>
+      <p class="lead">Identidad no es lo mismo que autorización</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="auth">○ Pendiente</button><button class="bookmark" data-bookmark="auth">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Autenticación responde “¿quién eres?”. Permisos responden “¿puedes hacer esto?”. DRF evalúa autenticación antes de permisos.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Mostrar tu identificación no significa automáticamente que puedas entrar a todas las salas.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Una API real no debería permitir cualquier modificación anónima.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 config/settings.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Request
+  ↓
+Authentication → request.user
+  ↓
+Permissions
+  ↓
+View</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Agrega SessionAuthentication para usar Browsable API.</div></li><li><span class="stepnum">2</span><div>Agrega BasicAuthentication solo para práctica local.</div></li><li><span class="stepnum">3</span><div>Configura IsAuthenticatedOrReadOnly.</div></li><li><span class="stepnum">4</span><div>Prueba GET anónimo y POST anónimo.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>REST_FRAMEWORK = {
+    &#x27;DEFAULT_AUTHENTICATION_CLASSES&#x27;: [
+        &#x27;rest_framework.authentication.SessionAuthentication&#x27;,
+        &#x27;rest_framework.authentication.BasicAuthentication&#x27;,
+    ],
+    &#x27;DEFAULT_PERMISSION_CLASSES&#x27;: [
+        &#x27;rest_framework.permissions.IsAuthenticatedOrReadOnly&#x27;,
+    ],
+    &#x27;DEFAULT_PAGINATION_CLASS&#x27;:
+        &#x27;rest_framework.pagination.PageNumberPagination&#x27;,
+    &#x27;PAGE_SIZE&#x27;: 5,
+}</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>GET puede ser público y POST debe pedir autenticación.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Explica por qué BasicAuthentication solo debe usarse con HTTPS si sale de un entorno local.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="token" data-title="tokenauthentication de drf" data-group="seguridad básica">
+      <div class="lesson-kicker">33 · SEGURIDAD BÁSICA</div>
+      <h2>TokenAuthentication de DRF</h2>
+      <p class="lead">Una opción simple para clientes no basados en sesión</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="token">○ Pendiente</button><button class="bookmark" data-bookmark="token">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>DRF incluye un sistema simple de tokens. El cliente envía Authorization: Token ... en cada petición.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>El login obtiene una credencial que luego acompaña cada solicitud.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Es suficiente para enseñar la idea de autenticación por token antes de estudiar JWT u otros esquemas.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 config/settings.py</span><span class="file-chip">📄 config/urls.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>POST /api-token-auth/
+   ↓ username/password
+{ token }
+   ↓
+Authorization: Token abc123...</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Agrega rest_framework.authtoken.</div></li><li><span class="stepnum">2</span><div>Ejecuta migrate.</div></li><li><span class="stepnum">3</span><div>Agrega TokenAuthentication.</div></li><li><span class="stepnum">4</span><div>Expón obtain_auth_token.</div></li><li><span class="stepnum">5</span><div>Crea un superusuario y solicita un token.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># settings.py -&gt; INSTALLED_APPS
+&#x27;rest_framework.authtoken&#x27;,
+
+# REST_FRAMEWORK
+&#x27;DEFAULT_AUTHENTICATION_CLASSES&#x27;: [
+    &#x27;rest_framework.authentication.TokenAuthentication&#x27;,
+    &#x27;rest_framework.authentication.SessionAuthentication&#x27;,
+],
+
+# config/urls.py
+from rest_framework.authtoken.views import obtain_auth_token
+
+urlpatterns += [
+    path(&#x27;api-token-auth/&#x27;, obtain_auth_token),
+]
+
+# Header
+Authorization: Token TU_TOKEN</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Una petición autenticada con token debe poder crear datos si los permisos lo permiten.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Compara en una tabla conceptual sesión vs token: dónde se guarda la credencial y quién suele usarla.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="proteger-delete" data-title="permisos por acción" data-group="seguridad básica">
+      <div class="lesson-kicker">34 · SEGURIDAD BÁSICA</div>
+      <h2>Permisos por acción</h2>
+      <p class="lead">Lectura para todos, escritura solo autenticados</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="proteger-delete">○ Pendiente</button><button class="bookmark" data-bookmark="proteger-delete">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Puedes cambiar permisos según la acción del ViewSet. La propiedad action indica si estás listando, creando, actualizando o eliminando.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>La sala de consulta puede ser pública; la zona de edición requiere credenciales.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Te enseña que los permisos pueden ser globales o específicos por vista/acción.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/views.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>ViewSet
+├── list/retrieve → AllowAny
+└── create/update/destroy → IsAuthenticated</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Importa AllowAny e IsAuthenticated.</div></li><li><span class="stepnum">2</span><div>Sobrescribe get_permissions.</div></li><li><span class="stepnum">3</span><div>Permite list y retrieve sin login.</div></li><li><span class="stepnum">4</span><div>Exige autenticación para el resto.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from rest_framework.permissions import AllowAny, IsAuthenticated
+
+class EstudianteViewSet(viewsets.ModelViewSet):
+    # ...
+    def get_permissions(self):
+        if self.action in [&#x27;list&#x27;, &#x27;retrieve&#x27;]:
+            classes = [AllowAny]
+        else:
+            classes = [IsAuthenticated]
+        return [permission() for permission in classes]</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Prueba GET sin token y POST sin token; deben comportarse distinto.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Haz que DELETE requiera IsAdminUser y documenta el motivo.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="pruebas-manuales" data-title="probar con browsable api y curl" data-group="pruebas">
+      <div class="lesson-kicker">35 · PRUEBAS</div>
+      <h2>Probar con Browsable API y curl</h2>
+      <p class="lead">No confíes en que “se ve bien”</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="pruebas-manuales">○ Pendiente</button><button class="bookmark" data-bookmark="pruebas-manuales">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Una API debe probar métodos, datos válidos, errores y permisos. DRF trae una interfaz navegable útil para aprender. curl permite reproducir peticiones desde terminal.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Probar una API es intentar tanto el camino correcto como los caminos que deben fallar.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Antes de automatizar tests necesitas saber qué comportamiento esperas.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/pruebas.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Cliente de prueba
+├── Browser DRF
+├── curl
+└── Postman/Insomnia (opcional)</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Prueba GET lista.</div></li><li><span class="stepnum">2</span><div>Prueba POST válido.</div></li><li><span class="stepnum">3</span><div>Prueba POST inválido.</div></li><li><span class="stepnum">4</span><div>Prueba 404.</div></li><li><span class="stepnum">5</span><div>Prueba autenticación.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>curl http://127.0.0.1:8000/api/estudiantes/
+
+curl -X POST http://127.0.0.1:8000/api/estudiantes/ \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Authorization: Token TU_TOKEN&quot; \
+  -d &#x27;{&quot;nombre&quot;:&quot;Carlos&quot;,&quot;correo&quot;:&quot;carlos@example.com&quot;,&quot;programa&quot;:1}&#x27;</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes tener una lista de casos de prueba y resultados esperados.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea una tabla con 10 pruebas: método, URL, body, status esperado y resultado.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="tests" data-title="tests automáticos de api" data-group="pruebas">
+      <div class="lesson-kicker">36 · PRUEBAS</div>
+      <h2>Tests automáticos de API</h2>
+      <p class="lead">APIClient y APITestCase</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="tests">○ Pendiente</button><button class="bookmark" data-bookmark="tests">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un test automático prepara datos, ejecuta una petición y verifica el resultado. Puede repetirse después de cada cambio.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>En vez de revisar manualmente diez puertas después de cada modificación, un robot las prueba por ti.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Protege el CRUD de regresiones y enseña a pensar en comportamiento.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/tests.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>academia/
+└── tests.py   ← pruebas de API</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea un programa en setUp.</div></li><li><span class="stepnum">2</span><div>Prueba GET de programas.</div></li><li><span class="stepnum">3</span><div>Prueba POST de estudiante inválido.</div></li><li><span class="stepnum">4</span><div>Ejecuta python manage.py test.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from .models import Programa
+
+class ProgramaApiTests(APITestCase):
+    def setUp(self):
+        self.programa = Programa.objects.create(
+            nombre=&#x27;Sistemas&#x27;
+        )
+
+    def test_listar_programas(self):
+        response = self.client.get(&#x27;/api/programas/&#x27;)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data[&#x27;results&#x27;]), 1)</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>python manage.py test debe terminar OK.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega un test que verifique que no se puede repetir el nombre de un programa.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="transacciones" data-title="transacciones" data-group="base de datos aplicada">
+      <div class="lesson-kicker">37 · BASE DE DATOS APLICADA</div>
+      <h2>Transacciones</h2>
+      <p class="lead">Todo o nada cuando varias operaciones dependen entre sí</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="transacciones">○ Pendiente</button><button class="bookmark" data-bookmark="transacciones">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Una transacción agrupa operaciones. Si algo falla, puedes revertir el conjunto y evitar datos a medias.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Una transferencia bancaria no debe descontar dinero de una cuenta si no logra abonarlo en la otra.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Aunque nuestro CRUD simple no siempre lo necesita, es un concepto central de bases de datos.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 docs/base_datos_avanzando.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>transaction.atomic()
+├── operación A
+├── operación B
+└── error → rollback</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Entiende commit y rollback.</div></li><li><span class="stepnum">2</span><div>Revisa transaction.atomic.</div></li><li><span class="stepnum">3</span><div>Identifica operaciones que deben ser indivisibles.</div></li><li><span class="stepnum">4</span><div>No agregues atomic sin necesidad a todo.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from django.db import transaction
+
+with transaction.atomic():
+    # ambas operaciones forman una unidad lógica
+    programa = Programa.objects.create(nombre=&#x27;Nuevo&#x27;)
+    Estudiante.objects.create(
+        nombre=&#x27;Ana&#x27;,
+        correo=&#x27;ana2@example.com&#x27;,
+        programa=programa,
+    )</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes explicar qué significa “todo o nada”.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Propón un caso académico donde dos o más cambios deban ejecutarse dentro de la misma transacción.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="indices" data-title="índices y rendimiento básico" data-group="base de datos aplicada">
+      <div class="lesson-kicker">38 · BASE DE DATOS APLICADA</div>
+      <h2>Índices y rendimiento básico</h2>
+      <p class="lead">Más velocidad de lectura con un costo</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="indices">○ Pendiente</button><button class="bookmark" data-bookmark="indices">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Un índice puede acelerar búsquedas, pero ocupa espacio y hace que escrituras deban mantener ese índice. No se crea un índice para cada columna sin pensar.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Es el índice de un libro: acelera encontrar temas, pero hay que mantenerlo cuando cambia el contenido.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Correo unique ya genera una necesidad de búsqueda eficiente; otros filtros frecuentes pueden necesitar índices.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/models.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Consulta frecuente
+   ↓
+¿campo selectivo y usado en filtros?
+   ↓
+considerar índice</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Identifica filtros frecuentes.</div></li><li><span class="stepnum">2</span><div>Recuerda que unique crea una restricción única respaldada por índice en PostgreSQL.</div></li><li><span class="stepnum">3</span><div>Usa db_index=True solo con motivo.</div></li><li><span class="stepnum">4</span><div>Mide antes de optimizar sistemas reales.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>class Estudiante(models.Model):
+    # ...
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, db_index=True)
+
+# luego
+python manage.py makemigrations
+python manage.py migrate</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes saber por qué indexar un BooleanField por sí solo puede no ser útil en muchos escenarios.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Elige dos consultas del proyecto y razona qué columnas participan en filtros, ordenamientos y joins.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="admin" data-title="admin para inspeccionar datos" data-group="herramientas django">
+      <div class="lesson-kicker">39 · HERRAMIENTAS DJANGO</div>
+      <h2>Admin para inspeccionar datos</h2>
+      <p class="lead">Una interfaz de administración, no el frontend de tu API</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="admin">○ Pendiente</button><button class="bookmark" data-bookmark="admin">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Django Admin ayuda a crear y revisar datos mientras desarrollas, pero no reemplaza los endpoints REST.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Es un panel interno para administradores; la API es la interfaz programable que usan otros sistemas.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>Facilita comprobar relaciones y datos durante las prácticas.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 academia/admin.py</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>/admin/
+├── Programas
+└── Estudiantes</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Registra modelos.</div></li><li><span class="stepnum">2</span><div>Crea superusuario.</div></li><li><span class="stepnum">3</span><div>Entra a /admin/.</div></li><li><span class="stepnum">4</span><div>Crea registros y confirma que aparecen en /api/.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>from django.contrib import admin
+from .models import Programa, Estudiante
+
+@admin.register(Programa)
+class ProgramaAdmin(admin.ModelAdmin):
+    list_display = (&#x27;id&#x27;, &#x27;nombre&#x27;, &#x27;activo&#x27;)
+    search_fields = (&#x27;nombre&#x27;,)
+
+@admin.register(Estudiante)
+class EstudianteAdmin(admin.ModelAdmin):
+    list_display = (&#x27;id&#x27;, &#x27;nombre&#x27;, &#x27;correo&#x27;, &#x27;programa&#x27;, &#x27;activo&#x27;)
+    list_filter = (&#x27;activo&#x27;, &#x27;programa&#x27;)
+    search_fields = (&#x27;nombre&#x27;, &#x27;correo&#x27;)
+
+# terminal
+python manage.py createsuperuser</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Un estudiante creado en admin debe verse al consultar la API.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Agrega filtros o búsquedas útiles para un administrador académico.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="proyecto-final" data-title="proyecto final: api academia" data-group="proyecto final">
+      <div class="lesson-kicker">40 · PROYECTO FINAL</div>
+      <h2>Proyecto final: API Academia</h2>
+      <p class="lead">Checklist completo desde base de datos hasta pruebas</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="proyecto-final">○ Pendiente</button><button class="bookmark" data-bookmark="proyecto-final">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>Ya tienes todas las piezas. El proyecto final consiste en reconstruirlas desde una carpeta vacía sin copiar todo de una vez.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>La guía fue el entrenamiento; ahora repites el proceso entendiendo por qué existe cada archivo.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>El aprendizaje se consolida cuando puedes construir el flujo completo en orden.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 todo el proyecto</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>api_academia/
+├── manage.py
+├── requirements.txt
+├── .env
+├── config/
+│   ├── settings.py
+│   └── urls.py
+└── academia/
+    ├── models.py
+    ├── serializers.py
+    ├── views.py
+    ├── urls.py
+    ├── admin.py
+    └── tests.py</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>Crea rol y base PostgreSQL.</div></li><li><span class="stepnum">2</span><div>Crea entorno e instala dependencias.</div></li><li><span class="stepnum">3</span><div>Crea proyecto y app.</div></li><li><span class="stepnum">4</span><div>Configura PostgreSQL.</div></li><li><span class="stepnum">5</span><div>Implementa modelos y migra.</div></li><li><span class="stepnum">6</span><div>Crea serializers.</div></li><li><span class="stepnum">7</span><div>Crea ViewSets y Router.</div></li><li><span class="stepnum">8</span><div>Agrega paginación, autenticación y permisos.</div></li><li><span class="stepnum">9</span><div>Carga datos.</div></li><li><span class="stepnum">10</span><div>Prueba CRUD y errores.</div></li><li><span class="stepnum">11</span><div>Ejecuta tests.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code>RUTAS FINALES
+
+GET/POST        /api/programas/
+GET/PATCH/DELETE /api/programas/{id}/
+
+GET/POST        /api/estudiantes/
+GET/PATCH/DELETE /api/estudiantes/{id}/
+
+POST             /api-token-auth/
+GET              /admin/</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>El proyecto está completo cuando puede arrancar desde cero, conectarse a PostgreSQL y pasar sus pruebas.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Extiende el sistema con Materia y Matrícula para practicar una relación N:M real.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section><section class="lesson" id="deploy" data-title="antes de producción" data-group="cierre">
+      <div class="lesson-kicker">41 · CIERRE</div>
+      <h2>Antes de producción</h2>
+      <p class="lead">Variables, DEBUG, HTTPS, backup y servidor real</p>
+      <div class="lesson-actions"><button class="understand" data-lesson="deploy">○ Pendiente</button><button class="bookmark" data-bookmark="deploy">☆ Guardar</button></div>
+
+      <div class="easy-grid">
+        <div class="mini-card"><b>💡 En palabras simples</b><p>runserver es para desarrollo. En producción debes usar una configuración segura, servidor WSGI/ASGI apropiado, HTTPS, secretos fuera del repositorio y copias de seguridad.</p></div>
+        <div class="mini-card"><b>🏠 Ejemplo cotidiano</b><p>Que una casa esté lista para una maqueta no significa que ya cumpla todos los requisitos para vivir en ella.</p></div>
+        <div class="mini-card"><b>🎯 ¿Por qué aquí?</b><p>La guía no debe dejar la impresión de que runserver y una contraseña en Git son suficientes.</p></div>
+      </div>
+
+      <div class="project-box">
+        <div class="box-title">🧩 APLÍCALO AL MISMO PROYECTO</div>
+        <div class="file-row"><span class="file-chip">📄 .env</span><span class="file-chip">📄 .gitignore</span><span class="file-chip">📄 docs/produccion.md</span></div>
+        <div class="project-grid">
+          <div>
+            <div class="subhead">📂 Estructura en esta lección</div>
+            <pre class="tree"><code>Producción
+├── DEBUG=False
+├── ALLOWED_HOSTS
+├── secretos externos
+├── HTTPS
+├── servidor app
+├── PostgreSQL seguro
+└── backups</code></pre>
+          </div>
+          <div>
+            <div class="subhead">👣 Paso a paso</div>
+            <ol class="steps"><li><span class="stepnum">1</span><div>No subas .env.</div></li><li><span class="stepnum">2</span><div>Usa DEBUG=False.</div></li><li><span class="stepnum">3</span><div>Configura ALLOWED_HOSTS.</div></li><li><span class="stepnum">4</span><div>Usa HTTPS para autenticación.</div></li><li><span class="stepnum">5</span><div>Automatiza backups de PostgreSQL.</div></li><li><span class="stepnum">6</span><div>Separa settings según entorno en proyectos mayores.</div></li></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-head"><span>⌨ Código / comandos</span><button class="copy">Copiar</button></div>
+        <pre><code># ejemplo de respaldo manual
+pg_dump -U api_academia_user -h localhost \
+  -Fc api_academia_db &gt; api_academia.backup
+
+# restauración a otra base
+pg_restore -U api_academia_user -h localhost \
+  -d api_academia_db_restaurada api_academia.backup</code></pre>
+      </div>
+
+      <div class="check"><b>✅ COMPROBACIÓN</b><p>Debes poder enumerar al menos cinco diferencias entre desarrollo y producción.</p></div>
+      <div class="activity"><b>🌟 ACTIVIDAD COMPLEMENTARIA</b><p>Crea un checklist de despliegue y marca qué elementos todavía faltan en tu proyecto.</p><small>🟡 Para reforzar la lección. No es obligatorio para continuar.</small></div>
+    </section>
+  </div>
+  <footer>DRF + PostgreSQL Academy · Proyecto didáctico progresivo · Guarda el progreso en este navegador.</footer>
+</main>
+<script>
+const lessonIds=['inicio', 'web-http', 'rest-json', 'bd-conceptos', 'pk-fk', 'relaciones', 'tipos-restricciones', 'normalizacion', 'sql-basico', 'sql-filtros', 'sql-join', 'postgres-instalar', 'postgres-comandos', 'postgres-db-user', 'entorno', 'crear-proyecto', 'settings-postgres', 'modelo-programa', 'modelo-estudiante', 'migraciones', 'orm', 'select-related', 'serializers', 'api-view', 'list-create', 'viewset-router', 'crud-rutas', 'status-errors', 'validacion', 'filtros', 'paginacion', 'auth', 'token', 'proteger-delete', 'pruebas-manuales', 'tests', 'transacciones', 'indices', 'admin', 'proyecto-final', 'deploy'];
+const done=new Set(JSON.parse(localStorage.getItem('drfDone')||'[]'));
+const marks=new Set(JSON.parse(localStorage.getItem('drfMarks')||'[]'));
+function save(){localStorage.setItem('drfDone',JSON.stringify([...done]));localStorage.setItem('drfMarks',JSON.stringify([...marks]));updateProgress()}
+function updateProgress(){
+  const pct=Math.round(done.size/lessonIds.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=pct+'%';
+  document.getElementById('progressCount').textContent=done.size+'/'+lessonIds.length;
+  document.querySelectorAll('.understand').forEach(b=>{const on=done.has(b.dataset.lesson);b.classList.toggle('on',on);b.textContent=on?'✓ Entendido':'○ Pendiente'});
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('done',done.has(a.dataset.target)));
+  document.querySelectorAll('.bookmark').forEach(b=>{const on=marks.has(b.dataset.bookmark);b.classList.toggle('on',on);b.textContent=on?'★ Guardado':'☆ Guardar'});
+}
+document.addEventListener('click',e=>{
+  const u=e.target.closest('.understand'); if(u){done.has(u.dataset.lesson)?done.delete(u.dataset.lesson):done.add(u.dataset.lesson);save()}
+  const b=e.target.closest('.bookmark'); if(b){marks.has(b.dataset.bookmark)?marks.delete(b.dataset.bookmark):marks.add(b.dataset.bookmark);save()}
+  const c=e.target.closest('.copy'); if(c){const t=c.closest('.code-wrap').querySelector('code').innerText;navigator.clipboard.writeText(t);c.textContent='Copiado ✓';setTimeout(()=>c.textContent='Copiar',1200)}
+  if(e.target.closest('.nav-link')) document.body.classList.remove('menu-open');
+});
+const search=document.getElementById('search');
+search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();let visible=0;document.querySelectorAll('.lesson').forEach(s=>{const ok=!q||s.innerText.toLowerCase().includes(q);s.style.display=ok?'':'none';if(ok)visible++});document.getElementById('noResults').style.display=visible?'none':'block'});
+document.getElementById('themeBtn').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('drfTheme',document.body.classList.contains('light')?'light':'dark')};
+if(localStorage.getItem('drfTheme')==='light')document.body.classList.add('light');
+document.getElementById('menuBtn').onclick=()=>document.body.classList.toggle('menu-open');
+const obs=new IntersectionObserver(entries=>{entries.forEach(x=>{if(x.isIntersecting){document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.dataset.target===x.target.id))}})},{rootMargin:'-25% 0px -65% 0px'});document.querySelectorAll('.lesson').forEach(s=>obs.observe(s));
+updateProgress();
+</script>
+</body></html>
