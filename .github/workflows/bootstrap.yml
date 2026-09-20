@@ -1,0 +1,51 @@
+name: Bootstrap biblioteca
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "payload.part-*"
+      - ".github/workflows/bootstrap.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: ${{ !contains(github.event.head_commit.message, '[bootstrap-complete]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruir paquete
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat payload.part-* > biblioteca.zip.b64
+          base64 -d biblioteca.zip.b64 > biblioteca.zip
+          rm -rf extracted
+          mkdir extracted
+          unzip -q biblioteca.zip -d extracted
+          shopt -s dotglob
+          cp -a extracted/bibliotecaDRFPostgreSQL/* .
+          shopt -u dotglob
+          rm -rf extracted biblioteca.zip biblioteca.zip.b64 payload.part-*
+          touch .nojekyll
+
+      - name: Commit final
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No hay cambios."
+            exit 0
+          fi
+          git commit -m "Publicar biblioteca DRF + PostgreSQL [bootstrap-complete]"
+          git push
